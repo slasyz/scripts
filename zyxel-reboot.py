@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-# Reboot ZyXEL router.
-
 import getpass
 import telnetlib
 import time

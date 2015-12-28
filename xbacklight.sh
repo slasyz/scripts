@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Cyclically changes screen brightness.
-
 brightness=`echo \`xbacklight -get\`/1 | bc`
 
 if (( $brightness >= 99 ))

@@ -1,8 +1,6 @@
 #!/usr/bin/python2
 # coding: utf-8
 
-# Translate phrases via Google Translate.
-
 import sys, json, re
 from urllib import quote
 from urllib2 import urlopen, HTTPError, Request

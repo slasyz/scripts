@@ -1,8 +1,6 @@
 #!/usr/bin/python2
 # coding: utf-8
 
-# Rename all occurences of phrase to another phrase.
-
 import sys, os
 
 orig = sys.argv[1]

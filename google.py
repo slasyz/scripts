@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 
-# Get google search results.
-
 import sys, json, urllib
 from urllib2 import urlopen, HTTPError
 
