@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # coding: utf-8
 
+# Get google search results.
+
 import sys, json, urllib
 from urllib2 import urlopen, HTTPError
-from functions import upload
 
 if len(sys.argv) < 3:
     print('Not enough parameters.\n./google.py COUNT TEXT')

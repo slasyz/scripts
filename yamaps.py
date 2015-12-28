@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # coding: utf-8
 
+# Search for object on Yandex.Maps and print its coordinates.
+
 import sys
 from urllib import quote
 from urllib2 import urlopen, HTTPError
