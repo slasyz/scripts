@@ -1,0 +1,14 @@
+[Unit]
+Description=regular_payments script
+After=network.target
+StartLimitBurst=5
+StartLimitIntervalSec=20s
+
+[Service]
+Type=simple
+WorkingDirectory={{ project_dir }}
+Environment=PYTHONUNBUFFERED=1
+ExecStart={{ project_dir }}/venv/bin/python ./src/main.py
+Restart=always
+StandardOutput=append:{{ logs_dir }}/regular_payments.log
+StandardError=append:{{ logs_dir }}/regular_payments.log

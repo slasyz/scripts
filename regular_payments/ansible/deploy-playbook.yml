@@ -1,0 +1,54 @@
+#- name: Pre-deploy actions
+#  hosts: localhost
+#  tasks:
+#    - name: Unit tests
+#      tags:
+#      command:
+#        chdir: ..
+#        cmd: "make test"
+#      ignore_errors: true
+#      register: test
+#    - name: Check return code
+#      fail:
+#        msg: "Run \"make test\""
+#      when: "test.rc != 0"
+
+
+- name: Deploy
+  hosts: digitalocean-1
+  vars:
+    project_dir: "{{ ansible_env.HOME }}/deployments/scripts/regular_payments"
+    logs_dir: "{{ ansible_env.HOME }}/logs/scripts/regular_payments"
+  tasks:
+    - name: Copy sources
+      synchronize:
+        src: ../src/
+        dest: "{{ project_dir }}/src/"
+        delete: yes
+    - name: Copy config
+      synchronize:
+        src: ../config.yml
+        dest: "{{ project_dir }}/config.yml"
+        delete: yes
+
+    - name: Copy requirements.txt
+      copy:
+        src: ../../requirements.txt
+        dest: "{{ project_dir }}/requirements.txt"
+    - name: Install Python deps
+      command:
+        chdir: "{{ project_dir }}"
+        cmd: "./venv/bin/pip install -r requirements.txt"
+
+    - name: Copy systemd service
+      template:
+        src: ../regular-payments.service
+        dest: ~/.config/systemd/user/regular-payments.service
+        mode: 0644
+    - name: Restart service
+      systemd:
+        name: regular-payments
+        state: restarted
+        daemon_reload: yes
+        scope: user
+        enabled: true
