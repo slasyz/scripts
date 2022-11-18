@@ -5,7 +5,7 @@ import time
 from dateutil.relativedelta import relativedelta
 
 import config
-import spreadsheet
+import sheet
 from payments import generate_payments
 import todoist
 
@@ -14,14 +14,15 @@ def step():
     logging.info('')
     logging.info('*** parsing table')
     c = config.load()
-    rows = spreadsheet.read_from_spreadsheet(c['sheet_id'])
+    rows = sheet.read_from_spreadsheet(c['sheet_id'])
 
     for row in rows:
         logging.info('-> %s | %s | %s %s / %s | %s | %s | %s',
                      row.category, row.name, row.price, row.currency, row.period, row.when, row.payment_source, row.todo)
 
-    since = datetime.date.today()
+    since = datetime.date.today() + relativedelta(days=1)
     until = since + relativedelta(months=1)
+
     logging.info('')
     logging.info(f'*** generating payments from {since} to {until}')
     payments = generate_payments(rows, since, until)

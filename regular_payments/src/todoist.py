@@ -12,14 +12,18 @@ DATE_FORMAT = '%Y-%m-%d'
 
 
 def generate_task_text(payment: Payment) -> str:
-    action = ', '.join([x.lower() for x in payment.row.todo])
+    actions = ', '.join([x.lower() for x in payment.row.todo])
 
     source = payment.row.payment_source
     if source == 'С баланса':
-        source = ' с баланса'
+        source = 'с баланса'
+    elif source == 'Вручную':
+        source = 'вручную'
+    elif source == '':
+        source = 'хз откуда'
     else:
-        source = ' с ' + source
-    return '[Оплата] ' + payment.name + source + ' (' + action + ')'
+        source = 'с ' + source
+    return f'[Оплата] {payment.name} — {payment.row.price} {payment.row.currency} {source} ({actions})'
 
 
 def retry_add_task(api: TodoistAPI, text: str, project_id: str, when_formatted: str):

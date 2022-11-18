@@ -3,7 +3,7 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 
-from spreadsheet import Row
+from sheet import Row
 
 
 @dataclass
