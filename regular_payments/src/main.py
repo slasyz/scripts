@@ -31,7 +31,7 @@ def step():
 
     logging.info('')
     logging.info(f'*** adding everything to Todoist')
-    todoist.put(c['todoist_token'], c['todoist_project_id'], payments)
+    todoist.put(c['todoist_token'], c['todoist_project_id'], payments, since)
 
 
 def main():

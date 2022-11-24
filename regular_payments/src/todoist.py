@@ -42,7 +42,7 @@ def retry_add_task(api: TodoistAPI, text: str, project_id: str, when_formatted: 
             raise
 
 
-def put(token: str, project_id: str, payments: list[Payment]):
+def put(token: str, project_id: str, payments: list[Payment], since: date):
     api = TodoistAPI(token)
     tasks = api.get_tasks(project_id=project_id)
 
@@ -53,8 +53,10 @@ def put(token: str, project_id: str, payments: list[Payment]):
             logging.info('-> deleting (no due date): %s [id=%s]', task.content, task.id)
             api.delete_task(task.id)
             continue
-
         task_date = datetime.strptime(task.due.date, DATE_FORMAT).date()
+        if task_date < since:
+            logging.info('-> ignoring (%s < %s): %s [id=%s]', task_date, since, task.content, task.id)
+
         if (task_date, task.content) in tasks_by_date.keys():
             logging.info('-> duplicate: %s [%s]', task.content, task_date)
             api.delete_task(task.id)
