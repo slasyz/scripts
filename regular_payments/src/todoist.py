@@ -54,8 +54,8 @@ def put(token: str, project_id: str, payments: list[Payment], since: date):
             api.delete_task(task.id)
             continue
         task_date = datetime.strptime(task.due.date, DATE_FORMAT).date()
-        if task_date < since:
-            logging.info('-> ignoring (%s < %s): %s [id=%s]', task_date, since, task.content, task.id)
+        if task_date <= since:
+            logging.info('-> ignoring (%s <= %s): %s [id=%s]', task_date, since, task.content, task.id)
 
         if (task_date, task.content) in tasks_by_date.keys():
             logging.info('-> duplicate: %s [%s]', task.content, task_date)
