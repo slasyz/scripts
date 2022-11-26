@@ -1,5 +1,5 @@
 - name: Prepare things
-  hosts: digitalocean-1
+  hosts: hetzner-1
   vars:
     project_dir: "{{ ansible_env.HOME }}/deployments/scripts/regular_payments"
     logs_dir: "{{ ansible_env.HOME }}/logs/scripts/regular_payments"
