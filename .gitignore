@@ -2,3 +2,4 @@ venv
 config.yml
 .idea
 __pycache__
+tdlib_files

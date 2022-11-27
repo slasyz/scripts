@@ -1,0 +1,38 @@
+- name: Deploy
+  hosts: hetzner-1
+  vars:
+    project_dir: "{{ ansible_env.HOME }}/deployments/scripts/vas3k_whois"
+    logs_dir: "{{ ansible_env.HOME }}/logs/scripts/vas3k_whois"
+  tasks:
+    - name: Copy sources
+      synchronize:
+        src: ../src/
+        dest: "{{ project_dir }}/src/"
+        delete: yes
+    - name: Copy config
+      synchronize:
+        src: ../config.yml
+        dest: "{{ project_dir }}/config.yml"
+        delete: yes
+
+    - name: Copy requirements.txt
+      copy:
+        src: ../../requirements.txt
+        dest: "{{ project_dir }}/requirements.txt"
+    - name: Install Python deps
+      command:
+        chdir: "{{ project_dir }}"
+        cmd: "./venv/bin/pip install -r requirements.txt"
+
+    - name: Copy systemd service
+      template:
+        src: ../vas3k-whois.service
+        dest: ~/.config/systemd/user/vas3k-whois.service
+        mode: 0644
+    - name: Restart service
+      systemd:
+        name: vas3k-whois
+        state: restarted
+        daemon_reload: yes
+        scope: user
+        enabled: true
