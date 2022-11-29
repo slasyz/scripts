@@ -6,18 +6,18 @@
   tasks:
     - name: Copy sources
       synchronize:
-        src: ../src/
+        src: ./src/
         dest: "{{ project_dir }}/src/"
         delete: yes
     - name: Copy config
       synchronize:
-        src: ../config.yml
+        src: ./config.yml
         dest: "{{ project_dir }}/config.yml"
         delete: yes
 
     - name: Copy requirements.txt
       copy:
-        src: ../../requirements.txt
+        src: ../requirements.txt
         dest: "{{ project_dir }}/requirements.txt"
     - name: Install Python deps
       command:
@@ -26,7 +26,7 @@
 
     - name: Copy systemd service
       template:
-        src: ../vas3k-whois.service
+        src: ./vas3k-whois.service
         dest: ~/.config/systemd/user/vas3k-whois.service
         mode: 0644
     - name: Restart service

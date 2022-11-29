@@ -16,11 +16,6 @@ run:            ## run script
 	../venv/bin/python ./src/main.py
 
 
-.PHONY: prepare
-prepare:         ## prepare remote environment using ansible
-	ansible-playbook --ask-vault-pass -i ../../infra/inventory.yml ansible/prepare-playbook.yml
-
-
 .PHONY: deploy
 deploy:         ## deploy using ansible
-	ansible-playbook --ask-vault-pass -i ../../infra/inventory.yml ansible/deploy-playbook.yml
+	ansible-playbook --ask-vault-pass -i ../../infra/inventory.yml playbook.yml
