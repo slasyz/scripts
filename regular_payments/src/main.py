@@ -3,6 +3,7 @@ import logging
 import time
 
 from dateutil.relativedelta import relativedelta
+import requests
 
 import config
 import sheet
@@ -32,6 +33,9 @@ def step():
     logging.info('')
     logging.info(f'*** adding everything to Todoist')
     todoist.put(c['todoist_token'], c['todoist_project_id'], payments, since)
+
+    logging.info('')
+    requests.get(c['uptime_url'])
 
 
 def main():

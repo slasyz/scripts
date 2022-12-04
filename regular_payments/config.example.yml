@@ -2,3 +2,4 @@ google_credentials: '{....... see https://developers.google.com/sheets/api/quick
 sheet_id: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms
 todoist_project_id: 1234567890
 todoist_token: abcd1234abcd1234abcd1234abcd1234
+uptime_url: https://uptime-kuma-addr/api/something
