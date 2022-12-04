@@ -3,6 +3,7 @@ import os.path
 import time
 
 import yaml
+import requests
 from telegram.client import Telegram
 
 
@@ -37,7 +38,12 @@ def main():
             sender_id = message['sender_id']
             if 'user_id' in sender_id.keys():
                 if sender_id['user_id'] == config['owner_user_id']:
+                    requests.get(config['uptime_url'])
                     logging.info('-> got message from owner: %s\n', message)
+
+        logging.info('-> queue size: %d of %d', tg.worker._queue.qsize(), tg.worker._queue.maxsize)
+        if tg.worker._queue.qsize() >= 500:
+            requests.get(config['uptime_too_big_url'] % (tg.worker._queue.qsize(),))
 
         # message = {
         #     '@type': 'message',
