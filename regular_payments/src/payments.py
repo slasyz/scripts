@@ -14,6 +14,7 @@ class Payment:
 
 
 PERIODS = {
+    '4 недели': relativedelta(weeks=4),
     'Месяц': relativedelta(months=1),
     'Полгода': relativedelta(months=6),
     '2 года': relativedelta(years=2),

@@ -56,6 +56,7 @@ def put(token: str, project_id: str, payments: list[Payment], since: date):
         task_date = datetime.strptime(task.due.date, DATE_FORMAT).date()
         if task_date <= since:
             logging.info('-> ignoring (%s <= %s): %s [id=%s]', task_date, since, task.content, task.id)
+            continue
 
         if (task_date, task.content) in tasks_by_date.keys():
             logging.info('-> duplicate: %s [%s]', task.content, task_date)
