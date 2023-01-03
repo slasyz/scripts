@@ -46,40 +46,51 @@ def put(token: str, project_id: str, payments: list[Payment], since: date):
     api = TodoistAPI(token)
     tasks = api.get_tasks(project_id=project_id)
 
-    tasks_by_date: dict[tuple[date, str], str] = {}  # tasks_by_date[when,text][id]
+    # Just a dictionary of all tasks in project.
+    # Using it to track duplicates.
+    all_tasks: dict[tuple[date, str], str] = {}  # all_tasks[when,text][id]
+    # Dictionary of all future tasks.
+    # Using it to clean up redundant future tasks (for example, tasks that were created as a result of previous modified script run).
+    new_tasks: dict[tuple[date, str], str] = {}  # new_tasks[when,text][id]
 
+    # Walking through all existing tasks in the list
     for task in tasks:
         if task.due is None:
+            # Just deleting it
             logging.info('-> deleting (no due date): %s [id=%s]', task.content, task.id)
             api.delete_task(task.id)
             continue
-        task_date = datetime.strptime(task.due.date, DATE_FORMAT).date()
-        if task_date <= since:
-            logging.info('-> ignoring (%s <= %s): %s [id=%s]', task_date, since, task.content, task.id)
-            continue
 
-        if (task_date, task.content) in tasks_by_date.keys():
+        task_date = datetime.strptime(task.due.date, DATE_FORMAT).date()
+        if task_date > since:
+            new_tasks[task_date, task.content] = task.id
+
+        # We already saw task with the same date and text.  Let's remove it.
+        if (task_date, task.content) in all_tasks.keys():
             logging.info('-> duplicate: %s [%s]', task.content, task_date)
             api.delete_task(task.id)
             continue
 
-        tasks_by_date[task_date, task.content] = task.id
+        all_tasks[task_date, task.content] = task.id
 
+    # Adding new payments
     for payment in payments:
         text = generate_task_text(payment)
         when = payment.when
         when_formatted = datetime.strftime(when, DATE_FORMAT)
 
-        if (when, text) in tasks_by_date.keys():
+        del new_tasks[when, text]
+
+        if (when, text) in all_tasks.keys():
             logging.info('-> already there: %s [%s]', text, when)
-            del tasks_by_date[when, text]
             continue
 
         logging.info('-> adding: %s [%s]', text, when)
         retry_add_task(api, text, project_id, when_formatted)
         time.sleep(0.5)
 
-    for key, val in tasks_by_date.items():
+    # Cleaning up redundant future tasks.
+    for key, val in new_tasks.items():
         logging.info('-> deleting: %s [%s] [id=%s]', key[1], key[0], val)
         api.delete_task(val)
         time.sleep(0.5)
