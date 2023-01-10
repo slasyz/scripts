@@ -79,7 +79,10 @@ def put(token: str, project_id: str, payments: list[Payment], since: date):
         when = payment.when
         when_formatted = datetime.strftime(when, DATE_FORMAT)
 
-        del new_tasks[when, text]
+        try:
+            del new_tasks[when, text]
+        except KeyError:
+            pass
 
         if (when, text) in all_tasks.keys():
             logging.info('-> already there: %s [%s]', text, when)
