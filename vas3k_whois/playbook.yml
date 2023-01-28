@@ -1,8 +1,9 @@
 - name: Deploy
   hosts: hetzner-1
   vars:
+    scripts_dir: "{{ ansible_env.HOME }}/deployments/scripts"
     project_dir: "{{ ansible_env.HOME }}/deployments/scripts/vas3k_whois"
-    logs_dir: "{{ ansible_env.HOME }}/logs/scripts/vas3k_whois"
+    logs_prefix: "{{ ansible_env.HOME }}/logs/vas3k_whois"
   tasks:
     - name: Copy sources
       synchronize:
@@ -14,15 +15,6 @@
         src: ./config.yml
         dest: "{{ project_dir }}/config.yml"
         delete: yes
-
-    - name: Copy requirements.txt
-      copy:
-        src: ../requirements.txt
-        dest: "{{ project_dir }}/requirements.txt"
-    - name: Install Python deps
-      command:
-        chdir: "{{ project_dir }}"
-        cmd: "./venv/bin/pip install -r requirements.txt"
 
     - name: Copy systemd service
       template:

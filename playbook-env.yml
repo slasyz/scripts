@@ -1,0 +1,17 @@
+- name: Deploy
+  hosts: hetzner-1
+  vars:
+    project_dir: "{{ ansible_env.HOME }}/deployments/scripts"
+  tasks:
+    - name: Copy requirements.txt
+      copy:
+        src: ./requirements.txt
+        dest: "{{ project_dir }}/requirements.txt"
+    - name: Create virtualenv
+      command:
+        chdir: "{{ project_dir }}"
+        cmd: "python3.10 -m venv venv"
+    - name: Install Python deps
+      command:
+        chdir: "{{ project_dir }}"
+        cmd: "./venv/bin/pip install -r requirements.txt"

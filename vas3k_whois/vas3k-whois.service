@@ -8,7 +8,8 @@ StartLimitIntervalSec=20s
 Type=simple
 WorkingDirectory={{ project_dir }}
 Environment=PYTHONUNBUFFERED=1
-ExecStart={{ project_dir }}/venv/bin/python ./src/main.py
+# Using full path to script so we could find it using "ps ax | grep whois"
+ExecStart={{ scripts_dir }}/venv/bin/python {{ project_dir }}/src/main.py
 Restart=always
-StandardOutput=append:{{ logs_dir }}/vas3k_whois.log
-StandardError=append:{{ logs_dir }}/vas3k_whois.log
+StandardOutput=append:{{ logs_prefix }}.log
+StandardError=append:{{ logs_prefix }}.log
