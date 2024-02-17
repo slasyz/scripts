@@ -5,6 +5,7 @@ import os
 
 DB_FILENAME = 'resources/moneywiz.sqlite3'
 CSV_FILENAME = 'resources/moneywiz.csv'
+NL_FILENAME = 'resources/nomadlist.csv'
 
 rates = {
     'USD': 1,
@@ -23,7 +24,8 @@ rates = {
     'THB': 35.75,
 }
 
-# TODO: добавить пометку со страной в которой находился в этот день
+
+# TODO: split Spent Date and Used Date (for example, for hotel bookins that would be transaction date vs check-in date)
 
 
 if os.path.exists(DB_FILENAME):
@@ -48,17 +50,38 @@ cursor.execute('''
         amount REAL, 
         currency TEXT, 
         tags TEXT,
-        amount_usd REAL
+        amount_usd REAL,
+        country TEXT,
+        city TEXT
     )
 ''')
 
+
+trips = []
+with open(NL_FILENAME, 'r') as file:
+    csv_reader = csv.reader(file)
+    next(csv_reader)  # Skip header row
+
+    for row in csv_reader:
+        trips.append(row)
+
+
+def search_place(date):
+    for i, trip in enumerate(trips):
+        arrival_date, departure_date, duration_days, city, country = trip
+        arrival_date = datetime.strptime(arrival_date, '%Y-%m-%d')
+        departure_date = datetime.strptime(departure_date, '%Y-%m-%d')
+        if arrival_date <= date < departure_date:
+            return country, city
+    return ['', '']
+
+
 # Open the CSV file and insert data into database
 with open(CSV_FILENAME, 'r') as file:
-    csvReader = csv.reader(file)
-    next(csvReader)  # Skip header row
-    next(csvReader)  # Skip header row
+    csv_reader = csv.reader(file)
+    next(csv_reader)  # Skip header row
 
-    for row in csvReader:
+    for row in csv_reader:
         name, current_balance, account, transfers, description, payee, category, date, time, memo, amount, currency, check_number, tags = row
 
         if current_balance != '':
@@ -80,9 +103,11 @@ with open(CSV_FILENAME, 'r') as file:
             category = category.strip()
             subcategory = subcategory.strip()
 
+        country, city = search_place(datetime.strptime(date, '%Y-%m-%d'))
+
         cursor.execute(
-            '''INSERT INTO transactions VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', 
-            [account, description, payee, category, subcategory, date, time, memo, amount, currency, tags, amount_usd]
+            '''INSERT INTO transactions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+            [account, description, payee, category, subcategory, date, time, memo, amount, currency, tags, amount_usd, country, city]
         )
 
 # Commit changes and close connection
