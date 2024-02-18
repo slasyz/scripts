@@ -9,7 +9,10 @@ Type=simple
 WorkingDirectory={{ project_dir }}
 Environment=PYTHONUNBUFFERED=1
 # Using full path to script so we could find it using "ps ax | grep regular"
-ExecStart={{ scripts_dir }}/venv/bin/python {{ project_dir }}/src/main.py
+ExecStart={{ home_dir }}/.local/bin/poetry run python {{ project_dir }}/src/main.py --loop
 Restart=always
 StandardOutput=append:{{ logs_prefix }}.log
 StandardError=append:{{ logs_prefix }}.log
+
+[Install]
+WantedBy=default.target
