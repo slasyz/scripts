@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "regular_payments"
+version = "0.1.0"
+description = ""
+authors = ["Vyacheslav Syrovatsky <vyacheslav@syrovats.ky>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.31.0"
+todoist-api-python = "2.0.2"
+google-auth = "2.14.1"
+python-dateutil = "^2.8.2"
+pyyaml = "^6.0.1"
+google-auth-oauthlib = "0.7.1"
+google-api-python-client = "2.66.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

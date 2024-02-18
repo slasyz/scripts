@@ -95,7 +95,7 @@ def read_from_spreadsheet(sheet_id: str) -> list[Row]:
         row = Row(
             category=row[0],
             name=row[1],
-            price=row[2],
+            price=row[2].strip(),
             currency=row[3],
             period=row[4],
             rub_in_period=row[5],

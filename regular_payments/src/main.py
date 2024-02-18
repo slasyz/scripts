@@ -1,6 +1,7 @@
 import datetime
 import logging
 import time
+import sys
 
 from dateutil.relativedelta import relativedelta
 import requests
@@ -42,11 +43,18 @@ def main():
     FORMAT = '%(asctime)s %(message)s'
     logging.basicConfig(format=FORMAT, level=logging.INFO)
 
-    while True:
+    is_loop = len(sys.argv) > 1 and sys.argv[1] == '--loop'
+
+    if is_loop:
+        while True:
+            step()
+            logging.info('')
+            logging.info('*** sleeping 24h...')
+            time.sleep(24 * 60 * 60)
+    else:
         step()
         logging.info('')
-        logging.info('*** sleeping 24h...')
-        time.sleep(24 * 60 * 60)
+        logging.info('*** finished!')
 
 
 if __name__ == '__main__':

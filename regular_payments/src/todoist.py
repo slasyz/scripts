@@ -9,6 +9,7 @@ from payments import Payment
 
 
 DATE_FORMAT = '%Y-%m-%d'
+DATE_FORMAT_HUMAN = '%d %b %Y'
 
 
 def generate_task_text(payment: Payment) -> str:
@@ -23,16 +24,33 @@ def generate_task_text(payment: Payment) -> str:
         source = 'хз откуда'
     else:
         source = 'с ' + source
-    return f'[Оплата] {payment.name} — {payment.row.price} {payment.row.currency} {source} ({actions})'
+
+    date_str = datetime.strftime(payment.when, DATE_FORMAT_HUMAN)
+    return f'[{date_str}] {payment.name} — {payment.row.price} {payment.row.currency} {source} ({actions})'
 
 
-def retry_add_task(api: TodoistAPI, text: str, project_id: str, when_formatted: str):
+def get_date_from_text(text: str) -> datetime | None:
+    if not text.startswith('['):
+        return None
+    text = text[1:]
+
+    i = text.find(']')
+    if i == -1:
+        return None
+    text = text[:i]
+
+    try:
+        return datetime.strptime(text, DATE_FORMAT_HUMAN).date()
+    except ValueError:
+        return None
+
+
+def retry_add_task(api: TodoistAPI, text: str, project_id: str):
     while True:
         try:
             api.add_task(
                 content=text,
                 project_id=project_id,
-                due_date=when_formatted,
             )
             return
         except HTTPError as ex:
@@ -55,13 +73,19 @@ def put(token: str, project_id: str, payments: list[Payment], since: date):
 
     # Walking through all existing tasks in the list
     for task in tasks:
-        if task.due is None:
-            # Just deleting it
-            logging.info('-> deleting (no due date): %s [id=%s]', task.content, task.id)
+        if task.due is not None:
+            # Just deleting it, something old
+            logging.info('-> deleting (with due date): %s [id=%s]', task.content, task.id)
             api.delete_task(task.id)
             continue
 
-        task_date = datetime.strptime(task.due.date, DATE_FORMAT).date()
+        task_date = get_date_from_text(task.content)
+        if task_date is None:
+            # Deleting, invalid date
+            logging.info('-> deleting (invalid date): %s [id=%s]', task.content, task.id)
+            api.delete_task(task.id)
+            continue
+
         if task_date > since:
             new_tasks[task_date, task.content] = task.id
 
@@ -77,7 +101,6 @@ def put(token: str, project_id: str, payments: list[Payment], since: date):
     for payment in payments:
         text = generate_task_text(payment)
         when = payment.when
-        when_formatted = datetime.strftime(when, DATE_FORMAT)
 
         try:
             del new_tasks[when, text]
@@ -89,7 +112,7 @@ def put(token: str, project_id: str, payments: list[Payment], since: date):
             continue
 
         logging.info('-> adding: %s [%s]', text, when)
-        retry_add_task(api, text, project_id, when_formatted)
+        retry_add_task(api, text, project_id)
         time.sleep(0.5)
 
     # Cleaning up redundant future tasks.
