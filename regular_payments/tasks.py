@@ -1,7 +1,7 @@
 from time import sleep
 
-from invoke import task
-from fabric import Connection
+from invoke import task  # type: ignore
+from fabric import Connection  # type: ignore
 
 
 def exec(c, cmd):
