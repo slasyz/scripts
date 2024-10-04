@@ -1,0 +1,18 @@
+{
+  "sources": [
+    {
+      "title": "Ollama Blog",
+      "name": "ollama",
+      "url": "https://ollama.com/blog",
+      "parsing_rules": {
+        "loop_selector": "a[href^='/blog/']",
+        "title_selector": "h2",
+        "date_selector": "h3",
+        "date_format": "January 2, 2006",
+        "body_selector": "p",
+        "link_selector": ""
+      }
+    }
+  ],
+  "destination": "./feeds"
+}

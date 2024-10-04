@@ -1,0 +1,13 @@
+https://rss.slasyz.dev {
+    tls internal
+    file_server
+    root * /home/sl/deployments/scripts/rss/feeds
+
+    log {
+        output file /var/log/caddy/rss.log
+    }
+}
+
+http://rss.slasyz.dev {
+    redir https://rss.slasyz.dev{uri} permanent
+}

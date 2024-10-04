@@ -1,0 +1,7 @@
+[Unit]
+Description=RSS Feed Parser
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/sl/deployments/scripts/rss
+ExecStart=/home/sl/deployments/scripts/rss/rss
