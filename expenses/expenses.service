@@ -1,0 +1,17 @@
+[Unit]
+Description=regular_payments script
+After=network.target
+StartLimitBurst=5
+StartLimitIntervalSec=20s
+
+[Service]
+Type=simple
+WorkingDirectory={{ project_dir }}
+Environment=PYTHONUNBUFFERED=1
+ExecStart={{ home_dir }}/.local/bin/poetry run uvicorn expenses.server:app --host 127.0.0.1 --port 8008
+Restart=always
+StandardOutput=append:{{ logs_prefix }}.log
+StandardError=append:{{ logs_prefix }}.log
+
+[Install]
+WantedBy=default.target

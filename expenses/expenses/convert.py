@@ -1,3 +1,4 @@
+import os.path
 import sqlite3
 import csv
 from datetime import datetime
@@ -18,23 +19,14 @@ rates = {
     'SGD': 1.35,
     'IDR': 15655,
     'THB': 35.75,
+    'TWD': 32.18,
 }
 
 
-# TODO: split Spent Date and Used Date (for example, for hotel bookins that would be transaction date vs check-in date)
+def convert(mw_filename: str, sqlite_filename: str):
+    mw_filename = os.path.expanduser(mw_filename)
+    sqlite_filename = os.path.expanduser(sqlite_filename)
 
-
-def search_place(date: datetime, trips: list[datetime, datetime, int, str, str]) -> tuple[str, str] | None:
-    for i, trip in enumerate(trips):
-        arrival_date, departure_date, duration_days, city, country = trip
-        arrival_date = datetime.strptime(arrival_date, '%Y-%m-%d')
-        departure_date = datetime.strptime(departure_date, '%Y-%m-%d')
-        if arrival_date <= date < departure_date:
-            return country, city
-    return ['', '']
-
-
-def convert(mw_filename: str, nl_filename: str, sqlite_filename: str):
     # Connect to SQLite database
     conn = sqlite3.connect(sqlite_filename)
     cursor = conn.cursor()
@@ -54,19 +46,11 @@ def convert(mw_filename: str, nl_filename: str, sqlite_filename: str):
             amount REAL,
             currency TEXT,
             tags TEXT,
-            amount_usd REAL,
-            country TEXT,
-            city TEXT
-        )
+            amount_usd REAL
+        );
     ''')
 
-    trips = []
-    with open(nl_filename, 'r') as file:
-        csv_reader = csv.reader(file)
-        next(csv_reader)  # Skip header row
-
-        for row in csv_reader:
-            trips.append(row)
+    cursor.execute('DELETE FROM transactions')
 
     # Open the CSV file and insert data into database
     with open(mw_filename, 'r') as file:
@@ -89,17 +73,16 @@ def convert(mw_filename: str, nl_filename: str, sqlite_filename: str):
             amount = -float(amount)
             date = datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
             amount_usd = float(amount) / rates[currency]
+            subcategory = ''
 
             if '▶︎' in category:
                 category, subcategory = category.split('▶︎')
                 category = category.strip()
                 subcategory = subcategory.strip()
 
-            country, city = search_place(datetime.strptime(date, '%Y-%m-%d'), trips)
-
             cursor.execute(
-                '''INSERT INTO transactions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                [account, description, payee, category, subcategory, date, time, memo, amount, currency, tags, amount_usd, country, city]
+                '''INSERT INTO transactions VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''',
+                [account, description, payee, category, subcategory, date, time, memo, amount, currency, tags, amount_usd]
             )
 
     # Commit changes and close connection

@@ -8,7 +8,7 @@ Converts a MoneyWiz csv file to a SQLite database.
 
 2. Export NomadList data to `resources/nomadlist.csv`
 
-3. Run `poetry run python expenses/main.py` to generate `moneywiz.sqlite3`
+3. Run `poetry run python expenses/script.py` to generate `moneywiz.sqlite3`
 
 4. Check its content using `litecli resources/moneywiz.sqlite3` or `sqlite3 resources/moneywiz.sqlite3`
 
