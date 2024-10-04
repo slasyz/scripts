@@ -3,3 +3,4 @@ config.yml
 .idea
 __pycache__
 tdlib_files
+.DS_Store
