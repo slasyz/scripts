@@ -1,0 +1,9 @@
+[Unit]
+Description=vdsalert timer
+
+[Timer]
+OnCalendar=minutely
+Persistent=true
+
+[Install]
+WantedBy=timers.target

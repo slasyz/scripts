@@ -1,0 +1,11 @@
+[Unit]
+Description=vdsalert service
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/sl/deployments/scripts/vdsalert
+ExecStart=bash /home/sl/deployments/scripts/vdsalert/vdsalert.sh
+
+[Install]
+WantedBy=multi-user.target
